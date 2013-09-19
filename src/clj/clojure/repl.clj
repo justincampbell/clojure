@@ -90,7 +90,7 @@ itself (not its value) is returned. The reader macro #'x expands to (var x)."}})
   (if (:special-form m)
     (do
       (println "Special Form")
-      (println " " (:doc m)) 
+      (println " " (:doc m))
       (if (contains? m :url)
         (when (:url m)
           (println (str "\n  Please see http://clojure.org/" (:url m))))
@@ -98,7 +98,7 @@ itself (not its value) is returned. The reader macro #'x expands to (var x)."}})
                       (:name m)))))
     (do
       (when (:macro m)
-        (println "Macro")) 
+        (println "Macro"))
       (println " " (:doc m)))))
 
 (defn find-doc

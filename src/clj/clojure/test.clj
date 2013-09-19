@@ -14,8 +14,8 @@
 ;; Thanks to Chas Emerick, Allen Rohner, and Stuart Halloway for
 ;; contributions and suggestions.
 
-(ns 
-  ^{:author "Stuart Sierra, with contributions and suggestions by 
+(ns
+  ^{:author "Stuart Sierra, with contributions and suggestions by
   Chas Emerick, Allen Rohner, and Stuart Halloway",
      :doc "A unit testing framework.
 
@@ -49,7 +49,7 @@
    \"(is (thrown? c ...))\" form tests if an exception of class c is
    thrown:
 
-   (is (thrown? ArithmeticException (/ 1 0))) 
+   (is (thrown? ArithmeticException (/ 1 0)))
 
    \"(is (thrown-with-msg? c re ...))\" does the same thing and also
    tests that the message on the exception matches the regular
@@ -250,7 +250,7 @@
 
 (def ^:dynamic
  ^{:doc "The maximum depth of stack traces to print when an Exception
-  is thrown during a test.  Defaults to nil, which means print the 
+  is thrown during a test.  Defaults to nil, which means print the
   complete stack trace."
    :added "1.1"}
  *stack-trace-depth* nil)
@@ -332,7 +332,7 @@
      :added "1.1"}
   report :type)
 
-(defn- file-and-line 
+(defn- file-and-line
   [exception depth]
   (let [^StackTraceElement s (nth (.getStackTrace exception) depth)]
     {:file (.getFileName s) :line (.getLineNumber s)}))
@@ -347,7 +347,7 @@
    (case
     (:type m)
     :fail (merge (file-and-line (new java.lang.Throwable) 1) m)
-    :error (merge (file-and-line (:actual m) 0) m) 
+    :error (merge (file-and-line (:actual m) 0) m)
     m)))
 
 (defmethod report :default [m]
@@ -457,7 +457,7 @@
 ;; macro.  These define different kinds of tests, based on the first
 ;; symbol in the test expression.
 
-(defmulti assert-expr 
+(defmulti assert-expr
   (fn [msg form]
     (cond
       (nil? form) :always-fail
@@ -538,7 +538,7 @@
 (defmacro is
   "Generic assertion macro.  'form' is any predicate test.
   'msg' is an optional message to attach to the assertion.
-  
+
   Example: (is (= 4 (+ 2 2)) \"Two plus two should be 4\")
 
   Special forms:
@@ -549,7 +549,7 @@
   (is (thrown-with-msg? c re body)) checks that an instance of c is
   thrown AND that the message on the exception matches (with
   re-find) the regular expression re."
-  {:added "1.1"} 
+  {:added "1.1"}
   ([form] `(is ~form nil))
   ([form msg] `(try-expr ~msg ~form)))
 
@@ -558,10 +558,10 @@
   See clojure.template/do-template for an explanation of
   templates.
 
-  Example: (are [x y] (= x y)  
+  Example: (are [x y] (= x y)
                 2 (+ 1 1)
                 4 (* 2 2))
-  Expands to: 
+  Expands to:
            (do (is (= 2 (+ 1 1)))
                (is (= 4 (* 2 2))))
 

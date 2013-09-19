@@ -6,7 +6,7 @@
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
 
-(ns 
+(ns
   ^{:author "Stuart Halloway",
     :doc "Non-core data functions."}
   clojure.data
@@ -85,13 +85,13 @@
 (extend-protocol EqualityPartition
   nil
   (equality-partition [x] :atom)
-  
+
   java.util.Set
   (equality-partition [x] :set)
 
   java.util.List
   (equality-partition [x] :sequential)
-  
+
   java.util.Map
   (equality-partition [x] :map))
 
@@ -108,11 +108,11 @@
      [(not-empty (set/difference aval bval))
       (not-empty (set/difference bval aval))
       (not-empty (set/intersection aval bval))]))
-  
+
   java.util.List
   (diff-similar [a b]
     (diff-sequential a b))
-  
+
   java.util.Map
   (diff-similar [a b]
     (diff-associative a b (set/union (keys a) (keys b)))))
@@ -136,4 +136,4 @@
     (if (= (equality-partition a) (equality-partition b))
       (diff-similar a b)
       (atom-diff a b))))
-  
+

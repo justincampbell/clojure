@@ -5,7 +5,7 @@
 ;   By using this software in any fashion, you are agreeing to be bound by
 ;   the terms of this license.
 ;   You must not remove this notice, or any other, from this software.
-(ns 
+(ns
   ^{:author "Christophe Grand, Stuart Sierra",
      :doc "A repl helper to quickly open javadocs."}
   clojure.java.javadoc
@@ -17,7 +17,7 @@
 (def ^:dynamic *feeling-lucky* true)
 
 (def ^:dynamic *local-javadocs* (ref (list)))
- 
+
 (def ^:dynamic *core-java-api*
   (case (System/getProperty "java.specification.version")
     "1.5" "http://java.sun.com/j2se/1.5.0/docs/api/"
@@ -75,8 +75,8 @@
   Tries *local-javadocs* first, then *remote-javadocs*."
   {:added "1.2"}
   [class-or-object]
-  (let [^Class c (if (instance? Class class-or-object) 
-                    class-or-object 
+  (let [^Class c (if (instance? Class class-or-object)
+                    class-or-object
                     (class class-or-object))]
     (if-let [url (javadoc-url (.getName c))]
       (browse-url url)

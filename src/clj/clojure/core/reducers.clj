@@ -270,7 +270,7 @@
   clojure.core.protocols/CollReduce
   (coll-reduce [this f1] (clojure.core.protocols/coll-reduce this f1 (f1)))
   (coll-reduce
-   [_  f1 init]
+   [_ f1 init]
    (clojure.core.protocols/coll-reduce
     right f1
     (clojure.core.protocols/coll-reduce left f1 init)))

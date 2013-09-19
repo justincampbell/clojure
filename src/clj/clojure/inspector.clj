@@ -20,7 +20,7 @@
   (not (coll? x)))
 
 (defn collection-tag [x]
-  (cond 
+  (cond
    (instance? java.util.Map$Entry x) :entry
    (instance? java.util.Map x) :seqable
    (instance? java.util.Set x) :seqable
@@ -87,8 +87,8 @@
 	(nth (vals (nth data rowIndex)) columnIndex))
       (isCellEditable [rowIndex columnIndex] false)
       (removeTableModelListener [tableModelListener]))))
-      
-(defn inspect-tree 
+
+(defn inspect-tree
   "creates a graphical (Swing) inspector on the supplied hierarchical data"
   {:added "1.0"}
   [data]
@@ -97,7 +97,7 @@
     (.setSize 400 600)
     (.setVisible true)))
 
-(defn inspect-table 
+(defn inspect-table
   "creates a graphical (Swing) inspector on the supplied regular
   data, which must be a sequential data structure of data structures
   of equal length"
@@ -116,14 +116,14 @@
 
 (defmethod list-provider java.util.List [c]
   (let [v (if (vector? c) c (vec c))]
-    {:nrows (count v) 
-     :get-value (fn [i] (v i)) 
+    {:nrows (count v)
+     :get-value (fn [i] (v i))
      :get-label (fn [i] i)}))
 
 (defmethod list-provider java.util.Map [c]
   (let [v (vec (sort (map (fn [[k v]] (vector k v)) c)))]
-    {:nrows (count v) 
-     :get-value (fn [i] ((v i) 1)) 
+    {:nrows (count v)
+     :get-value (fn [i] ((v i) 1))
      :get-label (fn [i] ((v i) 0))}))
 
 (defn list-model [provider]
@@ -132,7 +132,7 @@
       (getColumnCount [] 2)
       (getRowCount [] nrows)
       (getValueAt [rowIndex columnIndex]
-        (cond 
+        (cond
          (= 0 columnIndex) (get-label rowIndex)
          (= 1 columnIndex) (print-str (get-value rowIndex)))))))
 
@@ -171,7 +171,7 @@
                 (.add (JButton. "Next")))
               BorderLayout/NORTH)
         (.add
-          (JScrollPane. 
+          (JScrollPane.
             (doto (JTable. (list-model (list-provider x)))
               (.setAutoResizeMode JTable/AUTO_RESIZE_LAST_COLUMN)))
           BorderLayout/CENTER)))

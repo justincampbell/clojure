@@ -28,7 +28,7 @@
   {:added "1.1"}
   [e]
   (let [class (.getClassName e)
-	method (.getMethodName e)] 
+	method (.getMethodName e)]
     (let [match (re-matches #"^([A-Za-z0-9_.-]+)\$(\w+)__\d+$" (str class))]
       (if (and match (= "invoke" method))
 	(apply printf "%s/%s" (rest match))
@@ -51,7 +51,7 @@
      (let [st (.getStackTrace tr)]
        (print-throwable tr)
        (newline)
-       (print " at ") 
+       (print " at ")
        (print-trace-element (first st))
        (newline)
        (doseq [e (if (nil? n)

@@ -34,24 +34,24 @@
 ;;; really utilities, but I'm experimenting with them here.
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defmacro ^{:private true} 
-  getf 
+(defmacro ^{:private true}
+  getf
   "Get the value of the field a named by the argument (which should be a keyword)."
   [sym]
   `(~sym @@~'this))
 
-(defmacro ^{:private true} 
-  setf [sym new-val] 
+(defmacro ^{:private true}
+  setf [sym new-val]
   "Set the value of the field SYM to NEW-VAL"
   `(alter @~'this assoc ~sym ~new-val))
 
-(defmacro ^{:private true} 
+(defmacro ^{:private true}
   deftype [type-name & fields]
   (let [name-str (name type-name)]
     `(do
        (defstruct ~type-name :type-tag ~@fields)
        (alter-meta! #'~type-name assoc :private true)
-       (defn- ~(symbol (str "make-" name-str)) 
+       (defn- ~(symbol (str "make-" name-str))
          [& vals#] (apply struct ~type-name ~(keyword name-str) vals#))
        (defn- ~(symbol (str name-str "?")) [x#] (= (:type-tag x#) ~(keyword name-str))))))
 
@@ -67,16 +67,16 @@
 
 (defn- ancestor? [parent child]
   (loop [child (:parent child)]
-    (cond 
+    (cond
      (nil? child) false
      (identical? parent child) true
      :else (recur (:parent child)))))
 
 (defstruct ^{:private true} section :parent)
 
-(defn- buffer-length [l] 
+(defn- buffer-length [l]
   (let [l (seq l)]
-    (if l 
+    (if l
       (- (:end-pos (last l)) (:start-pos (first l)))
       0)))
 
@@ -105,7 +105,7 @@
    (when-let [cb (getf :logical-block-callback)] (cb :start))
    (let [lb (:logical-block token)]
     (dosync
-     (when-let [^String prefix (:prefix lb)] 
+     (when-let [^String prefix (:prefix lb)]
        (.write (getf :base) prefix))
      (let [col (get-column (getf :base))]
        (ref-set (:start-col lb) col)
@@ -113,12 +113,12 @@
 
 (defmethod write-token :end-block-t [^Writer this token]
   (when-let [cb (getf :logical-block-callback)] (cb :end))
-  (when-let [^String suffix (:suffix (:logical-block token))] 
+  (when-let [^String suffix (:suffix (:logical-block token))]
     (.write (getf :base) suffix)))
 
 (defmethod write-token :indent-t [^Writer this token]
   (let [lb (:logical-block token)]
-    (ref-set (:indent lb) 
+    (ref-set (:indent lb)
              (+ (:offset token)
                 (condp = (:relative-to token)
 		  :block @(:start-col lb)
@@ -145,7 +145,7 @@
 	(.write (getf :base) tws)))
     (write-token this token)
     (setf :trailing-white-space (:trailing-white-space token)))
-  (let [^String tws (getf :trailing-white-space)] 
+  (let [^String tws (getf :trailing-white-space)]
     (when (and force-trailing-whitespace tws)
       (.write (getf :base) tws)
       (setf :trailing-white-space nil))))
@@ -159,8 +159,8 @@
 (defn- tokens-fit? [^Writer this tokens]
 ;;;  (prlabel tf? (get-column (getf :base) (buffer-length tokens))
   (let [maxcol (get-max-column (getf :base))]
-    (or 
-     (nil? maxcol) 
+    (or
+     (nil? maxcol)
      (< (+ (get-column (getf :base)) (buffer-length tokens)) maxcol))))
 
 (defn- linear-nl? [this lb section]
@@ -200,19 +200,19 @@
 
 
 (defn- get-section [buffer]
-  (let [nl (first buffer) 
+  (let [nl (first buffer)
         lb (:logical-block nl)
         section (seq (take-while #(not (and (nl-t? %) (ancestor? (:logical-block %) lb)))
                                  (next buffer)))]
-    [section (seq (drop (inc (count section)) buffer))])) 
+    [section (seq (drop (inc (count section)) buffer))]))
 
 (defn- get-sub-section [buffer]
-  (let [nl (first buffer) 
+  (let [nl (first buffer)
         lb (:logical-block nl)
         section (seq (take-while #(let [nl-lb (:logical-block %)]
                                     (not (and (nl-t? %) (or (= nl-lb lb) (ancestor? nl-lb lb)))))
                             (next buffer)))]
-    section)) 
+    section))
 
 (defn- update-nl-state [lb]
   (dosync
@@ -228,11 +228,11 @@
   (.write (getf :base) (pp-newline))
   (dosync (setf :trailing-white-space nil))
   (let [lb (:logical-block nl)
-        ^String prefix (:per-line-prefix lb)] 
-    (if prefix 
+        ^String prefix (:per-line-prefix lb)]
+    (if prefix
       (.write (getf :base) prefix))
     (let [^String istr (apply str (repeat (- @(:indent lb) (count prefix))
-					  \space))] 
+					  \space))]
       (.write (getf :base) istr))
     (update-nl-state lb)))
 
@@ -261,9 +261,9 @@
     (if b
       (let [[section remainder] (get-section b)
             newl (first b)]
-;;         (prlabel wts (toks section)) (prlabel wts (:type newl)) (prlabel wts (toks remainder)) 
+;;         (prlabel wts (toks section)) (prlabel wts (:type newl)) (prlabel wts (toks remainder))
         (let [do-nl (emit-nl? newl this section (get-sub-section b))
-              result (if do-nl 
+              result (if do-nl
                        (do
 ;;                          (prlabel emit-nl (:type newl))
                          (emit-nl this newl)
@@ -281,7 +281,7 @@
                            (into [] (concat rem2 remainder))))
                        result)
 ;;              ff (prlabel wts (toks result))
-              ] 
+              ]
           result)))))
 
 (defn- write-line [^Writer this]
@@ -319,16 +319,16 @@
     (dosync
      (setf :trailing-white-space nil))))
 
-;;; If there are newlines in the string, print the lines up until the last newline, 
+;;; If there are newlines in the string, print the lines up until the last newline,
 ;;; making the appropriate adjustments. Return the remainder of the string
-(defn- write-initial-lines 
-  [^Writer this ^String s] 
+(defn- write-initial-lines
+  [^Writer this ^String s]
   (let [lines (.split s "\n" -1)]
     (if (= (count lines) 1)
       s
-      (dosync 
+      (dosync
        (let [^String prefix (:per-line-prefix (first (getf :logical-blocks)))
-             ^String l (first lines)] 
+             ^String l (first lines)]
          (if (= :buffering (getf :mode))
            (let [oldpos (getf :pos)
                  newpos (+ oldpos (count l))]
@@ -350,7 +350,7 @@
 
 (defn- p-write-char [^Writer this ^Integer c]
   (if (= (getf :mode) :writing)
-    (do 
+    (do
       (write-white-space this)
       (.write (getf :base) c))
     (if (= c \newline)
@@ -371,7 +371,7 @@
   (let [lb (struct logical-block nil nil (ref 0) (ref 0) (ref false) (ref false))
         fields (ref {:pretty-writer true
                      :base (column-writer writer max-columns)
-                     :logical-blocks lb 
+                     :logical-blocks lb
                      :sections nil
                      :mode :writing
                      :buffer []
@@ -383,11 +383,11 @@
     (proxy [Writer IDeref PrettyFlush] []
       (deref [] fields)
 
-      (write 
+      (write
        ([x]
           ;;     (prlabel write x (getf :mode))
           (condp = (class x)
-            String 
+            String
             (let [^String s0 (write-initial-lines this x)
                   ^String s (.replaceFirst s0 "\\s+$" "")
                   white-space (.substring s0 (count s))
@@ -427,10 +427,10 @@
 ;;; Methods for pretty-writer
 ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 
-(defn- start-block 
-  [^Writer this 
+(defn- start-block
+  [^Writer this
    ^String prefix ^String per-line-prefix ^String suffix]
-  (dosync 
+  (dosync
    (let [lb (struct logical-block (getf :logical-blocks) nil (ref 0) (ref 0)
                     (ref false) (ref false)
                     prefix per-line-prefix suffix)]
@@ -439,7 +439,7 @@
        (do
          (write-white-space this)
           (when-let [cb (getf :logical-block-callback)] (cb :start))
-          (if prefix 
+          (if prefix
            (.write (getf :base) prefix))
          (let [col (get-column (getf :base))]
            (ref-set (:start-col lb) col)
@@ -466,18 +466,18 @@
      (setf :logical-blocks (:parent lb)))))
 
 (defn- nl [^Writer this type]
-  (dosync 
+  (dosync
    (setf :mode :buffering)
    (let [pos (getf :pos)]
      (add-to-buffer this (make-nl-t type (getf :logical-blocks) pos pos)))))
 
 (defn- indent [^Writer this relative-to offset]
-  (dosync 
+  (dosync
    (let [lb (getf :logical-blocks)]
      (if (= (getf :mode) :writing)
        (do
          (write-white-space this)
-         (ref-set (:indent lb) 
+         (ref-set (:indent lb)
                   (+ offset (condp = relative-to
 			      :block @(:start-col lb)
 			      :current (get-column (getf :base))))))

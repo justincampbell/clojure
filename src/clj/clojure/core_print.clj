@@ -168,12 +168,12 @@
 
 (prefer-method print-dup clojure.lang.IPersistentCollection java.util.Collection)
 
-(def ^{:tag String 
+(def ^{:tag String
        :doc "Returns escape string for char or nil if none"
        :added "1.0"}
   char-escape-string
     {\newline "\\n"
-     \tab  "\\t"
+     \tab "\\t"
      \return "\\r"
      \" "\\\""
      \\  "\\\\"
@@ -198,9 +198,9 @@
   (print-sequential "[" pr-on " " "]" v w))
 
 (defn- print-map [m print-one w]
-  (print-sequential 
+  (print-sequential
    "{"
-   (fn [e  ^Writer w]
+   (fn [e ^Writer w]
      (do (print-one (key e) w) (.append w \space) (print-one (val e) w)))
    ", "
    "}"
@@ -284,7 +284,7 @@
 
 (def ^{:tag String
        :doc "Returns name string for char or nil if none"
-       :added "1.0"} 
+       :added "1.0"}
  char-name-string
    {\newline "newline"
     \tab "tab"

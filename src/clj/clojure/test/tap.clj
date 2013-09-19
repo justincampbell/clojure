@@ -62,7 +62,7 @@
   [msg]
   (println "ok" msg))
 
-(defn print-tap-fail 
+(defn print-tap-fail
   "Prints a TAP 'not ok' line.  msg is a string, with no line breaks"
   {:added "1.1"}
   [msg]

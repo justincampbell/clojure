@@ -58,7 +58,7 @@
   (coll-reduce
    ([coll f] (seq-reduce coll f))
    ([coll f val] (seq-reduce coll f val)))
-  
+
   Iterable
   (coll-reduce
    ([coll f]
@@ -88,7 +88,7 @@
   (internal-reduce
    [s f val]
    val)
-  
+
   ;; handles vectors and ranges
   clojure.lang.IChunkedSeq
   (internal-reduce
@@ -103,7 +103,7 @@
                   ret)))
        (internal-reduce s f val))
      val))
- 
+
   clojure.lang.StringSeq
   (internal-reduce
    [str-seq f val]
@@ -116,7 +116,7 @@
                   @ret
                   (recur (inc i) ret)))
          val))))
-  
+
   clojure.lang.ArraySeq
   (internal-reduce
        [a-seq f val]
@@ -129,7 +129,7 @@
                   @ret
                   (recur (inc i) ret)))
              val))))
-  
+
   java.lang.Object
   (internal-reduce
    [s f val]

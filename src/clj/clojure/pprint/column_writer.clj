@@ -25,7 +25,7 @@
 (defn- get-field [^Writer this sym]
   (sym @@this))
 
-(defn- set-field [^Writer this sym new-val] 
+(defn- set-field [^Writer this sym new-val]
   (alter @this assoc sym new-val))
 
 (defn- get-column [this]
@@ -52,7 +52,7 @@
 	    (set-field this :cur (inc (get-field this :cur)))))
   (.write ^Writer (get-field this :base) c))
 
-(defn- column-writer   
+(defn- column-writer
   ([writer] (column-writer writer *default-page-width*))
   ([writer max-columns]
      (let [fields (ref {:max max-columns, :cur 0, :line 0 :base writer})]
@@ -61,12 +61,12 @@
          (flush []
            (.flush writer))
          (write
-          ([^chars cbuf ^Integer off ^Integer len] 
-             (let [^Writer writer (get-field this :base)] 
+          ([^chars cbuf ^Integer off ^Integer len]
+             (let [^Writer writer (get-field this :base)]
                (.write writer cbuf off len)))
           ([x]
              (condp = (class x)
-               String 
+               String
                (let [^String s x
                      nl (.lastIndexOf s (int \newline))]
                  (dosync (if (neg? nl)

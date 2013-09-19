@@ -16,7 +16,7 @@
   (:refer-clojure :exclude (replace remove next)))
 
 (defn zipper
-  "Creates a new zipper structure. 
+  "Creates a new zipper structure.
 
   branch? is a fn that, given a node, returns true if can have
   children, even if it currently doesn't.
@@ -55,7 +55,7 @@
   given a root element"
   {:added "1.0"}
   [root]
-    (zipper (complement string?) 
+    (zipper (complement string?)
             (comp seq :content)
             (fn [node children]
               (assoc node :content (and children (apply vector children))))
@@ -115,9 +115,9 @@
       (let [[node path] loc
             [c & cnext :as cs] (children loc)]
         (when cs
-          (with-meta [c {:l [] 
-                         :pnodes (if path (conj (:pnodes path) node) [node]) 
-                         :ppath path 
+          (with-meta [c {:l []
+                         :pnodes (if path (conj (:pnodes path) node) [node])
+                         :ppath path
                          :r cnext}] (meta loc))))))
 
 (defn up
@@ -129,7 +129,7 @@
       (when pnodes
         (let [pnode (peek pnodes)]
           (with-meta (if changed?
-                       [(make-node loc pnode (concat l (cons node r))) 
+                       [(make-node loc pnode (concat l (cons node r)))
                         (and ppath (assoc ppath :changed? true))]
                        [pnode ppath])
                      (meta loc))))))
@@ -150,7 +150,7 @@
   "Returns the loc of the right sibling of the node at this loc, or nil"
   {:added "1.0"}
   [loc]
-    (let [[node {l :l  [r & rnext :as rs] :r :as path}] loc]
+    (let [[node {l :l [r & rnext :as rs] :r :as path}] loc]
       (when (and path rs)
         (with-meta [r (assoc path :l (conj l node) :r rnext)] (meta loc)))))
 
@@ -235,7 +235,7 @@
   [loc]
     (if (= :end (loc 1))
       loc
-      (or 
+      (or
        (and (branch? loc) (down loc))
        (right loc)
        (loop [p loc]
@@ -274,10 +274,10 @@
             (if-let [child (and (branch? loc) (down loc))]
               (recur (rightmost child))
               loc))
-          (with-meta [(make-node loc (peek pnodes) rs) 
+          (with-meta [(make-node loc (peek pnodes) rs)
                       (and ppath (assoc ppath :changed? true))]
                      (meta loc))))))
-  
+
 (comment
 
 (load-file "/Users/rich/dev/clojure/src/zip.clj")
@@ -305,14 +305,14 @@
 (loop [loc dz]
   (if (end? loc)
     (root loc)
-    (recur (next (if (= '* (node loc)) 
+    (recur (next (if (= '* (node loc))
                    (replace loc '/)
                    loc)))))
 
 (loop [loc dz]
   (if (end? loc)
     (root loc)
-    (recur (next (if (= '* (node loc)) 
+    (recur (next (if (= '* (node loc))
                    (remove loc)
                    loc)))))
 )

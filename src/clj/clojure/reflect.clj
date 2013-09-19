@@ -11,7 +11,7 @@
       :doc "Reflection on Host Types
 Alpha - subject to change.
 
-Two main entry points: 
+Two main entry points:
 
 * type-reflect reflects on something that implements TypeReference.
 * reflect (for REPL use) reflects on the class of an instance, or
@@ -67,7 +67,7 @@ Platform implementers must:
                      and can be a constructor, method, or field.
 
    Keys common to all members:
-   :name             name of the type 
+   :name             name of the type
    :declaring-class  name of the declarer
    :flags            keyword naming boolean attributes of the member
 

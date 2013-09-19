@@ -32,10 +32,10 @@
   (aset [arr ^int i val]))
 
 (deftype ArrayChunk [^clojure.core.ArrayManager am arr ^int off ^int end]
-  
+
   clojure.lang.Indexed
   (nth [_ i] (.aget am arr (+ off i)))
-  
+
   (count [_] (- end off))
 
   clojure.lang.IChunk
@@ -43,7 +43,7 @@
     (if (= off end)
       (throw (IllegalStateException. "dropFirst of empty chunk"))
       (new ArrayChunk am arr (inc off) end)))
-  
+
   (reduce [_ f init]
     (loop [ret init i off]
       (if (< i end)
@@ -51,7 +51,7 @@
         ret)))
   )
 
-(deftype VecSeq [^clojure.core.ArrayManager am ^clojure.core.IVecImpl vec anode ^int i ^int offset] 
+(deftype VecSeq [^clojure.core.ArrayManager am ^clojure.core.IVecImpl vec anode ^int i ^int offset]
   :no-print true
 
   clojure.core.protocols.InternalReduce
@@ -68,10 +68,10 @@
                         result))]
          (recur result (bit-and 0xffe0 (+ aidx 32))))
        result)))
-  
+
   clojure.lang.ISeq
   (first [_] (.aget am anode offset))
-  (next [this] 
+  (next [this]
     (if (< (inc offset) (.alength am anode))
       (new VecSeq am vec anode i (inc offset))
       (.chunkedNext this)))
@@ -108,7 +108,7 @@
 
   clojure.lang.IChunkedSeq
   (chunkedFirst [_] (ArrayChunk. am anode offset (.alength am anode)))
-  (chunkedNext [_] 
+  (chunkedNext [_]
    (let [nexti (+ i (.alength am anode))]
      (when (< nexti (count vec))
        (new VecSeq am vec (.arrayFor vec nexti) nexti 0))))
@@ -122,7 +122,7 @@
 (deftype Vec [^clojure.core.ArrayManager am ^int cnt ^int shift ^clojure.core.VecNode root tail _meta]
   Object
   (equals [this o]
-    (cond 
+    (cond
      (identical? this o) true
      (or (instance? clojure.lang.IPersistentVector o) (instance? java.util.RandomAccess o))
        (and (= cnt (count o))
@@ -141,8 +141,8 @@
       (if (= i cnt)
         hash
         (let [val (.nth this i)]
-          (recur (unchecked-add-int (unchecked-multiply-int 31 hash) 
-                                (clojure.lang.Util/hash val)) 
+          (recur (unchecked-add-int (unchecked-multiply-int 31 hash)
+                                (clojure.lang.Util/hash val))
                  (inc i))))))
 
   clojure.lang.Counted
@@ -171,19 +171,19 @@
         (System/arraycopy tail 0 new-tail 0 (.alength am tail))
         (.aset am new-tail (.alength am tail) val)
         (new Vec am (inc cnt) shift root new-tail (meta this)))
-      (let [tail-node (VecNode. (.edit root) tail)] 
+      (let [tail-node (VecNode. (.edit root) tail)]
         (if (> (bit-shift-right cnt (int 5)) (bit-shift-left (int 1) shift)) ;overflow root?
           (let [new-root (VecNode. (.edit root) (object-array 32))]
             (doto ^objects (.arr new-root)
               (aset 0 root)
               (aset 1 (.newPath this (.edit root) shift tail-node)))
-            (new Vec am (inc cnt) (+ shift (int 5)) new-root (let [tl (.array am 1)] (.aset am  tl 0 val) tl) (meta this)))
-          (new Vec am (inc cnt) shift (.pushTail this shift root tail-node) 
-                 (let [tl (.array am 1)] (.aset am  tl 0 val) tl) (meta this))))))
+            (new Vec am (inc cnt) (+ shift (int 5)) new-root (let [tl (.array am 1)] (.aset am tl 0 val) tl) (meta this)))
+          (new Vec am (inc cnt) shift (.pushTail this shift root tail-node)
+                 (let [tl (.array am 1)] (.aset am tl 0 val) tl) (meta this))))))
 
-  (empty [_] (new Vec am 0 5 EMPTY-NODE (.array am 0) nil))                             
+  (empty [_] (new Vec am 0 5 EMPTY-NODE (.array am 0) nil))
   (equiv [this o]
-    (cond 
+    (cond
      (or (instance? clojure.lang.IPersistentVector o) (instance? java.util.RandomAccess o))
        (and (= cnt (count o))
             (loop [i (int 0)]
@@ -197,14 +197,14 @@
 
   clojure.lang.IPersistentStack
   (peek [this]
-    (when (> cnt (int 0)) 
+    (when (> cnt (int 0))
       (.nth this (dec cnt))))
 
   (pop [this]
    (cond
-    (zero? cnt) 
+    (zero? cnt)
       (throw (IllegalStateException. "Can't pop empty vector"))
-    (= 1 cnt) 
+    (= 1 cnt)
       (new Vec am 0 5 EMPTY-NODE (.array am 0) (meta this))
     (> (- cnt (.tailoff this)) 1)
       (let [new-tail (.array am (dec (.alength am tail)))]
@@ -214,7 +214,7 @@
       (let [new-tail (.arrayFor this (- cnt 2))
             new-root ^clojure.core.VecNode (.popTail this shift root)]
         (cond
-         (nil? new-root) 
+         (nil? new-root)
            (new Vec am (dec cnt) shift EMPTY-NODE new-tail (meta this))
          (and (> shift 5) (nil? (aget ^objects (.arr new-root) 1)))
            (new Vec am (dec cnt) (- shift 5) (aget ^objects (.arr new-root) 0) new-tail (meta this))
@@ -223,7 +223,7 @@
 
   clojure.lang.IPersistentVector
   (assocN [this i val]
-    (cond 
+    (cond
      (and (<= (int 0) i) (< i cnt))
        (if (>= i (.tailoff this))
          (let [new-tail (.array am (.alength am tail))]
@@ -233,13 +233,13 @@
          (new Vec am cnt shift (.doAssoc this shift root i val) tail (meta this)))
      (= i cnt) (.cons this val)
      :else (throw (IndexOutOfBoundsException.))))
-  
+
   clojure.lang.Reversible
   (rseq [this]
         (if (> (.count this) 0)
           (clojure.lang.APersistentVector$RSeq. this (dec (.count this)))
           nil))
-  
+
   clojure.lang.Associative
   (assoc [this k v]
     (if (clojure.lang.Util/isInteger k)
@@ -274,27 +274,27 @@
           (throw (IndexOutOfBoundsException.))))
       (throw (IllegalArgumentException. "Key must be integer"))))
 
-  
+
   clojure.lang.Seqable
-  (seq [this] 
-    (if (zero? cnt) 
+  (seq [this]
+    (if (zero? cnt)
       nil
       (VecSeq. am this (.arrayFor this 0) 0 0)))
 
   clojure.lang.Sequential ;marker, no methods
 
   clojure.core.IVecImpl
-  (tailoff [_] 
+  (tailoff [_]
     (- cnt (.alength am tail)))
 
   (arrayFor [this i]
-    (if (and  (<= (int 0) i) (< i cnt))
+    (if (and (<= (int 0) i) (< i cnt))
       (if (>= i (.tailoff this))
         tail
         (loop [node root level shift]
           (if (zero? level)
             (.arr node)
-            (recur (aget ^objects (.arr node) (bit-and (bit-shift-right i level) (int 0x1f))) 
+            (recur (aget ^objects (.arr node) (bit-and (bit-shift-right i level) (int 0x1f)))
                    (- level (int 5))))))
       (throw (IndexOutOfBoundsException.))))
 
@@ -315,7 +315,7 @@
     (let [node ^clojure.core.VecNode node
           subidx (bit-and (bit-shift-right (- cnt (int 2)) level) (int 0x1f))]
       (cond
-       (> level 5) 
+       (> level 5)
          (let [new-child (.popTail this (- level 5) (aget ^objects (.arr node) subidx))]
            (if (and (nil? new-child) (zero? subidx))
              nil
@@ -335,7 +335,7 @@
         ret)))
 
   (doAssoc [this level node i val]
-    (let [node ^clojure.core.VecNode node]       
+    (let [node ^clojure.core.VecNode node]
       (if (zero? level)
         ;on this branch, array will need val type
         (let [arr (.aclone am (.arr node))]
@@ -449,7 +449,7 @@
       :char (mk-am char)
       :boolean (mk-am boolean)})
 
-(defn vector-of 
+(defn vector-of
   "Creates a new vector of a single primitive type t, where t is one
   of :int :long :float :double :byte :short :char or :boolean. The
   resulting vector complies with the interface of vectors in general,
@@ -488,7 +488,7 @@
      (.aset am arr 3 x4)
      (Vec. am 4 5 EMPTY-NODE arr nil)))
   ([t x1 x2 x3 x4 & xn]
-   (loop [v  (vector-of t x1 x2 x3 x4)
+   (loop [v (vector-of t x1 x2 x3 x4)
           xn xn]
      (if xn
        (recur (.cons v (first xn)) (next xn))

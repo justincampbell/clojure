@@ -274,7 +274,7 @@ by default when a new command-line REPL is started."} repl-requires
      (prompt)
      (flush)
      (loop []
-       (when-not 
+       (when-not
        	 (try (identical? (read-eval-print) request-exit)
 	  (catch Throwable e
 	   (caught e)
@@ -440,6 +440,6 @@ java -cp clojure.jar clojure.main -i init.clj script.clj args...")
          (recur more (conj inits [opt arg]))
          ((main-dispatch opt) args inits)))
      (repl-opt nil nil))
-   (finally 
+   (finally
      (flush))))
 
